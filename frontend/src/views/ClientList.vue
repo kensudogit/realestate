@@ -46,14 +46,15 @@
           </el-col>
           <el-col :span="6">
             <el-select
-              v-model="searchForm.status"
-              placeholder="ステータス"
+              v-model="searchForm.type"
+              placeholder="顧客タイプ"
               clearable
               style="width: 100%"
             >
-              <el-option label="アクティブ" value="ACTIVE" />
-              <el-option label="非アクティブ" value="INACTIVE" />
-              <el-option label="保留中" value="PENDING" />
+              <el-option label="購入希望者" value="BUYER" />
+              <el-option label="売却希望者" value="SELLER" />
+              <el-option label="賃貸希望者" value="TENANT" />
+              <el-option label="オーナー" value="LANDLORD" />
             </el-select>
           </el-col>
           <el-col :span="6">
