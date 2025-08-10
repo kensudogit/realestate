@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-bnd version="1.0">
+
+    <virtual-host name="default_host" />
+    
+    <res-ref name="jdbc/realestate" binding-name="jdbc/realestate" />
+    
+    <message-destination name="jms/realestate" binding-name="jms/realestate" />
+
+</web-bnd>

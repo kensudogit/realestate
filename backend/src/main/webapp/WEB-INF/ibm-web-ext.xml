@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-ext version="1.1">
+
+    <context-root uri="/realestate" />
+    
+    <reload-interval value="3" />
+    
+    <enable-directory-browsing value="false" />
+    
+    <enable-file-serving value="true" />
+    
+    <enable-reloading value="true" />
+    
+    <enable-serving-servlets-by-class-name value="false" />
+    
+    <enable-url-rewriting value="false" />
+    
+    <file-serving-enabled value="true" />
+    
+    <inventory-location value="" />
+    
+    <jsp-attribute name="keepgenerated" value="true" />
+    
+    <jsp-attribute name="scratchdir" value="${server.output.dir}/scratch" />
+    
+    <mime-filter enabled="false" />
+    
+    <pre-compile-jsps value="false" />
+    
+    <reload-enabled value="true" />
+    
+    <reload-interval value="3" />
+    
+    <shared-session-state value="false" />
+    
+    <single-threaded-servlet-pool value="false" />
+    
+    <webmodule-name value="real-estate-management" />
+    
+    <webmodule-uid value="real-estate-management.war" />
+
+</web-ext>
