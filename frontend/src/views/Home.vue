@@ -343,7 +343,19 @@ import { ref, onMounted, computed, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { propertyApi, clientApi, contractApi } from '@/services/api'
 import { Property, Contract, PropertyType, PropertyStatus, ContractType, ContractStatus, Client, ClientType } from '@/types'
-import { Chart } from 'chart.js'
+import {
+  Chart,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  LineController,
+  DoughnutController
+} from 'chart.js'
 import {
   House,
   User,
@@ -361,6 +373,20 @@ import {
   Sunny,
   Moon
 } from '@element-plus/icons-vue'
+
+// Chart.jsの登録
+Chart.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+  ArcElement,
+  LineController,
+  DoughnutController
+)
 
 const router = useRouter()
 
@@ -450,9 +476,17 @@ const filteredRecentContracts = computed(() => {
 })
 
 onMounted(async () => {
+  console.log('Home.vue onMounted 開始')
   await loadDashboardData()
   generateAvailableYears()
-  await setupCharts()
+  
+  // チャート初期化を少し遅延させて確実にDOMが準備されるようにする
+  setTimeout(async () => {
+    console.log('チャート初期化開始（遅延実行）')
+    await setupCharts()
+  }, 500)
+  
+  console.log('Home.vue onMounted 完了')
 })
 
 const loadDashboardData = async () => {
@@ -596,45 +630,151 @@ const generateAvailableYears = () => {
 }
 
 const setupCharts = async () => {
-  await nextTick()
-  
-  if (revenueChartRef.value && propertyTypeChartRef.value) {
+  try {
+    console.log('チャート初期化開始')
+    await nextTick()
+    
+    // チャートの参照が利用可能になるまで待機
+    let attempts = 0
+    const maxAttempts = 10
+    
+    while ((!revenueChartRef.value || !propertyTypeChartRef.value) && attempts < maxAttempts) {
+      console.log(`チャート参照待機中... 試行回数: ${attempts + 1}`)
+      await new Promise(resolve => setTimeout(resolve, 100))
+      attempts++
+    }
+    
+    if (!revenueChartRef.value || !propertyTypeChartRef.value) {
+      console.error('チャートの参照が取得できませんでした')
+      return
+    }
+    
+    console.log('チャート参照取得成功:', {
+      revenueChartRef: !!revenueChartRef.value,
+      propertyTypeChartRef: !!propertyTypeChartRef.value
+    })
+    
     // 売上チャートの初期化
     const revenueCtx = revenueChartRef.value.getContext('2d')
     if (revenueCtx) {
+      console.log('売上チャート初期化中...')
       revenueChart = new Chart(revenueCtx, {
         type: 'line',
         data: {
           labels: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
-          datasets: [{
-            label: '売上',
-            data: [12000000, 15000000, 18000000, 14000000, 20000000, 22000000, 25000000, 28000000, 30000000, 32000000, 35000000, 38000000],
-            borderColor: isDarkMode.value ? '#67C23A' : '#409EFF',
-            backgroundColor: isDarkMode.value ? 'rgba(103, 194, 58, 0.1)' : 'rgba(64, 158, 255, 0.1)',
-            fill: true
-          }]
+          datasets: [
+            {
+              label: '売上',
+              data: [12000000, 15000000, 18000000, 14000000, 20000000, 22000000, 25000000, 28000000, 30000000, 32000000, 35000000, 38000000],
+              borderColor: isDarkMode.value ? '#67C23A' : '#409EFF',
+              backgroundColor: isDarkMode.value ? 'rgba(103, 194, 58, 0.1)' : 'rgba(64, 158, 255, 0.1)',
+              fill: true,
+              tension: 0.4,
+              borderWidth: 3,
+              pointBackgroundColor: isDarkMode.value ? '#67C23A' : '#409EFF',
+              pointBorderColor: '#ffffff',
+              pointBorderWidth: 2,
+              pointRadius: 6,
+              pointHoverRadius: 8
+            },
+            {
+              label: '目標',
+              data: [15000000, 15000000, 15000000, 15000000, 15000000, 15000000, 15000000, 15000000, 15000000, 15000000, 15000000, 15000000],
+              borderColor: isDarkMode.value ? '#F56C6C' : '#E6A23C',
+              backgroundColor: 'transparent',
+              borderDash: [5, 5],
+              borderWidth: 2,
+              pointRadius: 0,
+              fill: false
+            }
+          ]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          },
           plugins: {
             legend: {
-              display: false
+              display: true,
+              position: 'top',
+              labels: {
+                usePointStyle: true,
+                padding: 20,
+                font: {
+                  size: 12
+                }
+              }
+            },
+            tooltip: {
+              backgroundColor: isDarkMode.value ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+              titleColor: isDarkMode.value ? '#ffffff' : '#333333',
+              bodyColor: isDarkMode.value ? '#ffffff' : '#333333',
+              borderColor: isDarkMode.value ? '#67C23A' : '#409EFF',
+              borderWidth: 1,
+              cornerRadius: 8,
+              displayColors: true,
+              callbacks: {
+                label: function(context: any) {
+                  if (context.datasetIndex === 0) {
+                    return `売上: ¥${context.parsed.y.toLocaleString()}`
+                  } else {
+                    return `目標: ¥${context.parsed.y.toLocaleString()}`
+                  }
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: {
+                color: isDarkMode.value ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+              },
+              ticks: {
+                color: isDarkMode.value ? '#ffffff' : '#333333',
+                font: {
+                  size: 11
+                }
+              }
+            },
+            y: {
+              grid: {
+                color: isDarkMode.value ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+              },
+              ticks: {
+                color: isDarkMode.value ? '#ffffff' : '#333333',
+                font: {
+                  size: 11
+                },
+                callback: function(value: any) {
+                  return '¥' + (value / 1000000).toFixed(1) + 'M'
+                }
+              },
+              beginAtZero: true
+            }
+          },
+          elements: {
+            point: {
+              hoverBackgroundColor: isDarkMode.value ? '#67C23A' : '#409EFF'
             }
           }
-        } as any
+        }
       })
+      console.log('売上チャート初期化完了')
     }
 
     // 物件タイプ別分布チャートの初期化
     const propertyTypeCtx = propertyTypeChartRef.value.getContext('2d')
     if (propertyTypeCtx) {
+      console.log('物件タイプ別分布チャート初期化中...')
       propertyTypeChart = new Chart(propertyTypeCtx, {
         type: 'doughnut',
         data: {
           labels: ['マンション', '一戸建て', '商業施設', '土地', 'オフィス', '倉庫'],
           datasets: [{
-            data: [30, 25, 15, 20, 8, 2],
+            data: [35, 28, 18, 22, 12, 5],
             backgroundColor: [
               '#409EFF',
               '#67C23A',
@@ -642,33 +782,110 @@ const setupCharts = async () => {
               '#909399',
               '#F56C6C',
               '#9C27B0'
-            ]
+            ],
+            borderColor: '#ffffff',
+            borderWidth: 2,
+            hoverBorderWidth: 3,
+            hoverOffset: 8
           }]
         },
         options: {
           responsive: true,
           maintainAspectRatio: false,
+          cutout: '60%',
           plugins: {
             legend: {
-              position: 'bottom'
+              position: 'bottom',
+              labels: {
+                usePointStyle: true,
+                padding: 15,
+                font: {
+                  size: 11
+                },
+                generateLabels: function(chart: any) {
+                  const data = chart.data
+                  if (data.labels && data.datasets && data.datasets[0]) {
+                    return data.labels.map((label: string, i: number) => {
+                      const value = data.datasets[0].data[i] as number
+                      const total = (data.datasets[0].data as number[]).reduce((a: number, b: number) => a + b, 0)
+                      const percentage = ((value / total) * 100).toFixed(1)
+                      return {
+                        text: `${label}: ${value}件 (${percentage}%)`,
+                        fillStyle: data.datasets[0].backgroundColor[i],
+                        strokeStyle: data.datasets[0].backgroundColor[i],
+                        lineWidth: 0,
+                        pointStyle: 'circle',
+                        hidden: false,
+                        index: i
+                      }
+                    })
+                  }
+                  return []
+                }
+              }
+            },
+            tooltip: {
+              backgroundColor: isDarkMode.value ? 'rgba(0, 0, 0, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+              titleColor: isDarkMode.value ? '#ffffff' : '#333333',
+              bodyColor: isDarkMode.value ? '#ffffff' : '#333333',
+              borderColor: isDarkMode.value ? '#67C23A' : '#409EFF',
+              borderWidth: 1,
+              cornerRadius: 8,
+              callbacks: {
+                label: function(context: any) {
+                  const label = context.label || ''
+                  const value = context.parsed
+                  const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0)
+                  const percentage = ((value / total) * 100).toFixed(1)
+                  return `${label}: ${value}件 (${percentage}%)`
+                }
+              }
             }
+          },
+          animation: {
+            animateRotate: true,
+            animateScale: true,
+            duration: 1000,
+            easing: 'easeOutQuart'
           }
         }
       })
+      console.log('物件タイプ別分布チャート初期化完了')
     }
+    
+    console.log('全チャート初期化完了')
+  } catch (error) {
+    console.error('チャート初期化エラー:', error)
   }
 }
 
 const updateRevenueChart = async () => {
   try {
     chartLoading.value = true
-    // 実際のAPIからデータを取得
-    const response = await contractApi.getAll()
-    const contracts = response.data || []
+    
+    // 実際のAPIからデータを取得する場合は以下を使用
+    // const response = await contractApi.getAll()
+    // const contracts = response.data || []
+    
+    // モックデータ（実際の実装時は上記のAPIコールに置き換え）
+    const mockContracts = [
+      { startDate: '2024-01-15', amount: 25000000 },
+      { startDate: '2024-02-20', amount: 35000000 },
+      { startDate: '2024-03-10', amount: 28000000 },
+      { startDate: '2024-04-05', amount: 42000000 },
+      { startDate: '2024-05-12', amount: 38000000 },
+      { startDate: '2024-06-18', amount: 45000000 },
+      { startDate: '2024-07-22', amount: 52000000 },
+      { startDate: '2024-08-08', amount: 48000000 },
+      { startDate: '2024-09-14', amount: 55000000 },
+      { startDate: '2024-10-25', amount: 62000000 },
+      { startDate: '2024-11-30', amount: 58000000 },
+      { startDate: '2024-12-15', amount: 68000000 }
+    ]
     
     // 選択された年の月別データを集計
     const monthlyData = new Array(12).fill(0)
-    contracts.forEach(contract => {
+    mockContracts.forEach(contract => {
       const contractDate = new Date(contract.startDate)
       if (contractDate.getFullYear() === selectedYear.value) {
         const month = contractDate.getMonth()
@@ -698,19 +915,36 @@ const refreshChartData = () => {
   updateRevenueChart()
 }
 
-const refreshPropertyTypeChart = () => {
-  // 物件タイプ別分布チャートのデータを更新
-  if (propertyTypeChart && propertyTypeChart.data && propertyTypeChart.data.datasets && propertyTypeChart.data.datasets[0]) {
-    propertyTypeChart.data.datasets[0].data = [
-      Math.floor(Math.random() * 10) + 5, // マンション
-      Math.floor(Math.random() * 10) + 5, // 一戸建て
-      Math.floor(Math.random() * 10) + 5, // 商業施設
-      Math.floor(Math.random() * 10) + 5, // 土地
-      Math.floor(Math.random() * 10) + 5, // オフィス
-      Math.floor(Math.random() * 10) + 5  // 倉庫
+const refreshPropertyTypeChart = async () => {
+  try {
+    chartLoading.value = true
+    
+    // 実際のAPIからデータを取得する場合は以下を使用
+    // const response = await propertyApi.getAll()
+    // const properties = response.data || []
+    
+    // モックデータ（実際の実装時は上記のAPIコールに置き換え）
+    const mockPropertyData = [
+      { type: 'APARTMENT', count: Math.floor(Math.random() * 15) + 25 },
+      { type: 'HOUSE', count: Math.floor(Math.random() * 12) + 20 },
+      { type: 'COMMERCIAL', count: Math.floor(Math.random() * 10) + 15 },
+      { type: 'LAND', count: Math.floor(Math.random() * 8) + 18 },
+      { type: 'OFFICE', count: Math.floor(Math.random() * 6) + 10 },
+      { type: 'WAREHOUSE', count: Math.floor(Math.random() * 4) + 3 }
     ]
-    propertyTypeChart.update()
+    
+    // 物件タイプ別分布チャートのデータを更新
+    if (propertyTypeChart && propertyTypeChart.data && propertyTypeChart.data.datasets && propertyTypeChart.data.datasets[0]) {
+      const newData = mockPropertyData.map(item => item.count)
+      propertyTypeChart.data.datasets[0].data = newData
+      propertyTypeChart.update()
+    }
+    
     showSuccess('物件タイプ別分布チャートを更新しました')
+  } catch (error) {
+    handleError(error, '物件タイプ別分布チャートの更新に失敗しました')
+  } finally {
+    chartLoading.value = false
   }
 }
 
@@ -1158,6 +1392,11 @@ const debounceContractSearch = () => {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+.chart-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
 .chart-container {
   height: 270px;
   position: relative;
@@ -1167,6 +1406,61 @@ const debounceContractSearch = () => {
 .chart-container canvas {
   width: 100% !important;
   height: 100% !important;
+}
+
+.chart-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.chart-controls .el-select {
+  width: 120px;
+}
+
+.chart-controls .el-button {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.chart-controls .el-button:hover {
+  transform: scale(1.05);
+}
+
+.chart-loading {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* チャートのカスタムスタイル */
+.chart-card .el-card__header {
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+  border-bottom: 1px solid rgba(235, 238, 245, 0.6);
+}
+
+.dark-mode .chart-card .el-card__header {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02));
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+.chart-card .card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 20px 12px;
+}
+
+.chart-card .card-header span {
+  font-weight: 600;
+  color: #2c3e50;
+  font-size: 1.1rem;
+}
+
+.dark-mode .chart-card .card-header span {
+  color: #ffffff;
 }
 
 .action-row {
