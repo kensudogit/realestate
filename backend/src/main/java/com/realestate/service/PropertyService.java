@@ -8,10 +8,13 @@ import com.realestate.repository.PropertyRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -23,6 +26,8 @@ import java.util.stream.Collectors;
 @Transactional
 public class PropertyService {
     
+    private static final Logger log = LoggerFactory.getLogger(PropertyService.class);
+    
     // 物件リポジトリ（データアクセス層）
     private final PropertyRepository propertyRepository;
     
@@ -31,9 +36,16 @@ public class PropertyService {
      * @return 物件DTOのリスト
      */
     public List<PropertyDto> getAllProperties() {
-        return propertyRepository.findAll().stream()
-            .map(this::convertToDto)
-            .collect(Collectors.toList());
+        try {
+            List<Property> properties = propertyRepository.findAll();
+            return properties.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("物件データの取得に失敗しました", e);
+            // エラー時は空のリストを返す
+            return new ArrayList<>();
+        }
     }
     
     /**
@@ -74,12 +86,18 @@ public class PropertyService {
      * @return 該当する物件DTOのリスト
      */
     public List<PropertyDto> searchProperties(String query) {
-        List<Property> properties = propertyRepository.findByNameContainingIgnoreCase(query);
-        properties.addAll(propertyRepository.findByAddressContainingIgnoreCase(query));
-        return properties.stream()
-            .distinct()
-            .map(this::convertToDto)
-            .collect(Collectors.toList());
+        try {
+            List<Property> properties = propertyRepository.findByNameContainingIgnoreCase(query);
+            properties.addAll(propertyRepository.findByAddressContainingIgnoreCase(query));
+            return properties.stream()
+                .distinct()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("物件検索に失敗しました: {}", query, e);
+            // エラー時は空のリストを返す
+            return new ArrayList<>();
+        }
     }
     
     /**

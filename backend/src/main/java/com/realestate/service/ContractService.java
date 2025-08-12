@@ -13,10 +13,13 @@ import com.realestate.repository.PropertyRepository;
 import com.realestate.repository.ClientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 /**
@@ -26,6 +29,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ContractService {
+
+    private static final Logger log = LoggerFactory.getLogger(ContractService.class);
 
     // 契約リポジトリ（データアクセス層）
     private final ContractRepository contractRepository;
@@ -39,9 +44,16 @@ public class ContractService {
      * @return 契約DTOのリスト
      */
     public List<ContractDto> getAllContracts() {
-        return contractRepository.findAll().stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        try {
+            List<Contract> contracts = contractRepository.findAll();
+            return contracts.stream()
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("契約データの取得に失敗しました", e);
+            // エラー時は空のリストを返す
+            return new ArrayList<>();
+        }
     }
 
     /**
@@ -74,6 +86,56 @@ public class ContractService {
         return contractRepository.findByStatus(status).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * クエリによる契約の検索
+     * @param query 検索クエリ（契約番号、物件名、顧客名、契約タイプ、ステータスなど）
+     * @return 該当する契約DTOのリスト
+     */
+    public List<ContractDto> searchContracts(String query) {
+        try {
+            String lowerQuery = query.toLowerCase();
+            List<Contract> allContracts = contractRepository.findAll();
+            return allContracts.stream()
+                    .filter(contract -> {
+                        // 契約番号での検索
+                        if (contract.getContractNumber() != null && 
+                            contract.getContractNumber().toLowerCase().contains(lowerQuery)) {
+                            return true;
+                        }
+                        // 物件名での検索
+                        if (contract.getProperty() != null && 
+                            contract.getProperty().getName() != null &&
+                            contract.getProperty().getName().toLowerCase().contains(lowerQuery)) {
+                            return true;
+                        }
+                        // 顧客名での検索
+                        if (contract.getClient() != null) {
+                            String clientName = contract.getClient().getFirstName() + " " + contract.getClient().getLastName();
+                            if (clientName.toLowerCase().contains(lowerQuery)) {
+                                return true;
+                            }
+                        }
+                        // 契約タイプでの検索
+                        if (contract.getType() != null && 
+                            contract.getType().name().toLowerCase().contains(lowerQuery)) {
+                            return true;
+                        }
+                        // 契約ステータスでの検索
+                        if (contract.getStatus() != null && 
+                            contract.getStatus().name().toLowerCase().contains(lowerQuery)) {
+                            return true;
+                        }
+                        return false;
+                    })
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("契約検索に失敗しました: {}", query, e);
+            // エラー時は空のリストを返す
+            return new ArrayList<>();
+        }
     }
 
     /**

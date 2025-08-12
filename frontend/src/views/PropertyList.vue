@@ -157,7 +157,7 @@
               {{ formatDate(row.createdAt) }}
             </template>
           </el-table-column>
-          <el-table-column label="操作" width="150" fixed="right">
+          <el-table-column label="操作" width="200" fixed="right">
             <template #default="{ row }">
               <div class="action-buttons">
                 <el-button
@@ -174,6 +174,15 @@
                   class="edit-btn"
                 >
                   <el-icon><Edit /></el-icon>
+                </el-button>
+                <el-button
+                  size="small"
+                  type="success"
+                  @click.stop="addPropertyInfo(row)"
+                  class="info-btn"
+                >
+                  <el-icon><InfoFilled /></el-icon>
+                  情報追加
                 </el-button>
                 <el-button
                   size="small"
@@ -206,25 +215,34 @@
               @click="viewProperty(property)"
               :class="{ 'sold': property.status === 'SOLD' }"
             >
-              <div class="property-image">
-                <el-image
-                  :src="getPropertyImage(property)"
-                  fit="cover"
-                  class="image"
-                  :preview-src-list="[getPropertyImage(property)]"
-                >
-                  <template #error>
-                    <div class="image-placeholder">
-                      <el-icon><Picture /></el-icon>
-                    </div>
-                  </template>
-                </el-image>
-                <div class="property-badge">
-                  <el-tag :type="getTypeTagType(property.type)" size="small">
-                    {{ getTypeLabel(property.type) }}
-                  </el-tag>
-                </div>
-              </div>
+                             <div class="property-image">
+                 <el-image
+                   :src="getPropertyImage(property)"
+                   fit="cover"
+                   class="image"
+                   :preview-src-list="[getPropertyImage(property)]"
+                   :initial-index="0"
+                   lazy
+                 >
+                   <template #error>
+                     <div class="image-placeholder">
+                       <el-icon><Picture /></el-icon>
+                       <p>画像なし</p>
+                     </div>
+                   </template>
+                   <template #placeholder>
+                     <div class="image-loading">
+                       <el-icon class="is-loading"><Picture /></el-icon>
+                       <p>読み込み中...</p>
+                     </div>
+                   </template>
+                 </el-image>
+                 <div class="property-badge">
+                   <el-tag :type="getTypeTagType(property.type)" size="small">
+                     {{ getTypeLabel(property.type) }}
+                   </el-tag>
+                 </div>
+               </div>
               <div class="property-info">
                 <h3 class="property-title">{{ property.name }}</h3>
                 <p class="property-address">{{ property.address }}</p>
@@ -285,6 +303,81 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- 物件情報追加ダイアログ -->
+    <el-dialog v-model="propertyInfoDialogVisible" title="物件情報追加" width="600px">
+      <el-form :model="propertyInfoForm" :rules="propertyInfoRules" ref="propertyInfoFormRef" label-width="120px">
+        <el-form-item label="物件名" prop="name">
+          <el-input v-model="propertyInfoForm.name" disabled />
+        </el-form-item>
+        <el-form-item label="追加情報タイプ" prop="infoType">
+          <el-select v-model="propertyInfoForm.infoType" placeholder="情報タイプを選択">
+            <el-option label="写真・画像" value="PHOTO" />
+            <el-option label="動画" value="VIDEO" />
+            <el-option label="ドキュメント" value="DOCUMENT" />
+            <el-option label="メモ・備考" value="NOTE" />
+            <el-option label="価格履歴" value="PRICE_HISTORY" />
+            <el-option label="見学記録" value="VIEWING_RECORD" />
+            <el-option label="その他" value="OTHER" />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="タイトル" prop="title">
+          <el-input v-model="propertyInfoForm.title" placeholder="情報のタイトルを入力" />
+        </el-form-item>
+        <el-form-item label="説明" prop="description">
+          <el-input
+            v-model="propertyInfoForm.description"
+            type="textarea"
+            :rows="3"
+            placeholder="詳細な説明を入力"
+          />
+        </el-form-item>
+        <el-form-item label="ファイル" prop="file">
+          <el-upload
+            class="upload-demo"
+            action="#"
+            :auto-upload="false"
+            :on-change="handleFileChange"
+            :file-list="fileList"
+          >
+            <el-button type="primary">ファイルを選択</el-button>
+            <template #tip>
+              <div class="el-upload__tip">
+                画像、動画、PDF等のファイルをアップロードできます
+              </div>
+            </template>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="重要度" prop="priority">
+          <el-rate v-model="propertyInfoForm.priority" :max="5" />
+        </el-form-item>
+        <el-form-item label="タグ" prop="tags">
+          <el-select
+            v-model="propertyInfoForm.tags"
+            multiple
+            filterable
+            allow-create
+            default-first-option
+            placeholder="タグを選択または作成"
+          >
+            <el-option label="好立地" value="好立地" />
+            <el-option label="駅近" value="駅近" />
+            <el-option label="新築" value="新築" />
+            <el-option label="リフォーム済み" value="リフォーム済み" />
+            <el-option label="ペット可" value="ペット可" />
+            <el-option label="駐車場完備" value="駐車場完備" />
+            <el-option label="バルコニー" value="バルコニー" />
+            <el-option label="エレベーター" value="エレベーター" />
+          </el-select>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="propertyInfoDialogVisible = false">キャンセル</el-button>
+          <el-button type="primary" @click="submitPropertyInfo">追加</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -301,7 +394,8 @@ import {
   View,
   Edit,
   Delete,
-  Picture
+  Picture,
+  InfoFilled
 } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -314,6 +408,8 @@ const deleteLoading = ref(false)
 const deleteDialogVisible = ref(false)
 const propertyToDelete = ref<Property | null>(null)
 const isDarkMode = ref(false)
+const propertyInfoDialogVisible = ref(false)
+const fileList = ref<any[]>([])
 
 // データ
 const properties = ref<Property[]>([])
@@ -329,6 +425,23 @@ const filters = ref({
   status: '',
   priceRange: ''
 })
+
+// 物件情報追加フォーム
+const propertyInfoForm = ref({
+  name: '',
+  infoType: '',
+  title: '',
+  description: '',
+  file: null,
+  priority: 3,
+  tags: []
+})
+
+const propertyInfoRules = {
+  infoType: [{ required: true, message: '情報タイプを選択してください', trigger: 'change' }],
+  title: [{ required: true, message: 'タイトルを入力してください', trigger: 'blur' }],
+  description: [{ required: true, message: '説明を入力してください', trigger: 'blur' }]
+}
 
 // 物件タイプとステータスの定義
 const propertyTypes = [
@@ -407,13 +520,13 @@ const loadDummyData = () => {
   const dummyProperties: Property[] = [
     {
       id: 1,
-      name: 'サンプルマンションA',
-      address: '東京都渋谷区1-1-1',
+      name: '青山マンション 101号室',
+      address: '東京都港区青山1-1-1',
       description: '駅徒歩5分の好立地マンション',
       type: PropertyType.APARTMENT,
       status: PropertyStatus.AVAILABLE,
-      price: 25000000,
-      area: 65,
+      price: 85000000,
+      area: 65.5,
       rooms: 2,
       bathrooms: 1,
       parkingSpaces: 1,
@@ -422,12 +535,12 @@ const loadDummyData = () => {
     },
     {
       id: 2,
-      name: 'サンプル一戸建てB',
-      address: '東京都世田谷区2-2-2',
+      name: '代官山一戸建て',
+      address: '東京都世田谷区代官山2-2-2',
       description: '閑静な住宅街の一戸建て',
       type: PropertyType.HOUSE,
-      status: PropertyStatus.SOLD,
-      price: 35000000,
+      status: PropertyStatus.AVAILABLE,
+      price: 120000000,
       area: 120,
       rooms: 3,
       bathrooms: 2,
@@ -437,18 +550,48 @@ const loadDummyData = () => {
     },
     {
       id: 3,
-      name: 'サンプル商業施設C',
-      address: '東京都新宿区3-3-3',
+      name: '新宿オフィスビル',
+      address: '東京都新宿区新宿3-3-3',
       description: '繁華街の商業ビル',
       type: PropertyType.COMMERCIAL,
       status: PropertyStatus.AVAILABLE,
-      price: 50000000,
+      price: 250000000,
       area: 200,
       rooms: 5,
       bathrooms: 3,
       parkingSpaces: 5,
       yearBuilt: 2018,
       createdAt: '2024-01-05'
+    },
+    {
+      id: 4,
+      name: '六本木ヒルズレジデンス',
+      address: '東京都港区六本木4-4-4',
+      description: '高級マンション',
+      type: PropertyType.APARTMENT,
+      status: PropertyStatus.AVAILABLE,
+      price: 350000000,
+      area: 180,
+      rooms: 4,
+      bathrooms: 2,
+      parkingSpaces: 2,
+      yearBuilt: 2020,
+      createdAt: '2024-01-20'
+    },
+    {
+      id: 5,
+      name: '銀座商業ビル',
+      address: '東京都中央区銀座5-5-5',
+      description: '銀座の商業施設',
+      type: PropertyType.COMMERCIAL,
+      status: PropertyStatus.AVAILABLE,
+      price: 180000000,
+      area: 150,
+      rooms: 3,
+      bathrooms: 2,
+      parkingSpaces: 3,
+      yearBuilt: 2019,
+      createdAt: '2024-01-25'
     }
   ]
   
@@ -498,6 +641,38 @@ const viewProperty = (property: Property) => {
 const editProperty = (property: Property) => {
   if (property.id) {
     router.push(`/properties/${property.id}/edit`)
+  }
+}
+
+const addPropertyInfo = (property: Property) => {
+  propertyInfoForm.value.name = property.name
+  propertyInfoForm.value.infoType = ''
+  propertyInfoForm.value.title = ''
+  propertyInfoForm.value.description = ''
+  propertyInfoForm.value.file = null
+  propertyInfoForm.value.priority = 3
+  propertyInfoForm.value.tags = []
+  fileList.value = []
+  propertyInfoDialogVisible.value = true
+}
+
+const handleFileChange = (file: any, fileList: any[]) => {
+  propertyInfoForm.value.file = file
+}
+
+const submitPropertyInfo = async () => {
+  try {
+    // 実際のAPIで情報を保存
+    // await propertyInfoApi.create({
+    //   propertyId: selectedProperty.value.id,
+    //   ...propertyInfoForm.value
+    // })
+    
+    (ElMessage as any).success('物件情報が追加されました')
+    propertyInfoDialogVisible.value = false
+  } catch (error) {
+    console.error('物件情報の追加に失敗しました:', error)
+    (ElMessage as any).error('物件情報の追加に失敗しました')
   }
 }
 
@@ -603,8 +778,18 @@ const formatDate = (dateString: string) => {
 }
 
 const getPropertyImage = (property: Property) => {
-  // 実際の実装では、物件の画像URLを返す
-  return `https://via.placeholder.com/300x200/667eea/ffffff?text=${encodeURIComponent(property.name)}`
+  // 物件タイプに応じたデフォルト画像を返す
+  const typeImages = {
+    [PropertyType.APARTMENT]: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=300&h=200&fit=crop',
+    [PropertyType.HOUSE]: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=300&h=200&fit=crop',
+    [PropertyType.COMMERCIAL]: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=300&h=200&fit=crop',
+    [PropertyType.LAND]: 'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=300&h=200&fit=crop',
+    [PropertyType.OFFICE]: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=300&h=200&fit=crop',
+    [PropertyType.WAREHOUSE]: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=300&h=200&fit=crop'
+  }
+  
+  // 物件タイプに応じた画像を返す
+  return typeImages[property.type] || `https://via.placeholder.com/300x200/667eea/ffffff?text=${encodeURIComponent(property.name)}`
 }
 
 const getRowClassName = ({ row }: { row: Property }) => {
@@ -744,8 +929,19 @@ const getRowClassName = ({ row }: { row: Property }) => {
   gap: 8px;
 }
 
-.view-btn, .edit-btn, .delete-btn {
+.view-btn, .edit-btn, .delete-btn, .info-btn {
   border-radius: 8px;
+}
+
+.info-btn {
+  background-color: #67c23a;
+  border-color: #67c23a;
+  color: white;
+}
+
+.info-btn:hover {
+  background-color: #85ce61;
+  border-color: #85ce61;
 }
 
 .grid-view {
@@ -791,12 +987,47 @@ const getRowClassName = ({ row }: { row: Property }) => {
 
 .image-placeholder {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   height: 100%;
-  background: #f5f7fa;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
   color: #909399;
-  font-size: 3rem;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.image-placeholder p {
+  margin: 8px 0 0 0;
+  font-size: 0.9rem;
+  color: #909399;
+}
+
+.image-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  color: #909399;
+  font-size: 2rem;
+  text-align: center;
+}
+
+.image-loading p {
+  margin: 8px 0 0 0;
+  font-size: 0.9rem;
+  color: #909399;
+}
+
+.image-loading .is-loading {
+  animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .property-badge {

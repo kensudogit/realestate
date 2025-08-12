@@ -11,6 +11,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * クライアント管理サービスクラス
@@ -20,6 +23,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ClientService {
 
+    private static final Logger log = LoggerFactory.getLogger(ClientService.class);
+
     // クライアントリポジトリ（データアクセス層）
     private final ClientRepository clientRepository;
 
@@ -28,9 +33,16 @@ public class ClientService {
      * @return クライアントDTOのリスト
      */
     public List<ClientDto> getAllClients() {
-        return clientRepository.findAll().stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+        try {
+            List<Client> clients = clientRepository.findAll();
+            return clients.stream()
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("クライアントデータの取得に失敗しました", e);
+            // エラー時は空のリストを返す
+            return new ArrayList<>();
+        }
     }
 
     /**
@@ -52,6 +64,78 @@ public class ClientService {
         return clientRepository.findByType(type).stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * クエリによるクライアントの検索
+     * @param query 検索クエリ（名前、メール、住所など）
+     * @return 該当するクライアントDTOのリスト
+     */
+    public List<ClientDto> searchClients(String query) {
+        try {
+            String lowerQuery = query.toLowerCase();
+            List<Client> allClients = clientRepository.findAll();
+            return allClients.stream()
+                    .filter(client -> 
+                        client.getFirstName().toLowerCase().contains(lowerQuery) ||
+                        client.getLastName().toLowerCase().contains(lowerQuery) ||
+                        client.getEmail().toLowerCase().contains(lowerQuery) ||
+                        (client.getAddress() != null && client.getAddress().toLowerCase().contains(lowerQuery))
+                    )
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("クライアント検索に失敗しました: {}", query, e);
+            // エラー時は空のリストを返す
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * 高度な検索・フィルタリング
+     * @param name 顧客名（部分一致）
+     * @param email メールアドレス（部分一致）
+     * @param type 顧客タイプ
+     * @param status ステータス
+     * @return 該当するクライアントDTOのリスト
+     */
+    public List<ClientDto> advancedSearch(String name, String email, ClientType type, String status) {
+        try {
+            List<Client> allClients = clientRepository.findAll();
+            return allClients.stream()
+                    .filter(client -> {
+                        // 名前フィルタリング
+                        if (name != null && !name.trim().isEmpty()) {
+                            String fullName = (client.getFirstName() + " " + client.getLastName()).toLowerCase();
+                            if (!fullName.contains(name.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        
+                        // メールフィルタリング
+                        if (email != null && !email.trim().isEmpty()) {
+                            if (!client.getEmail().toLowerCase().contains(email.toLowerCase())) {
+                                return false;
+                            }
+                        }
+                        
+                        // タイプフィルタリング
+                        if (type != null && client.getType() != type) {
+                            return false;
+                        }
+                        
+                        // ステータスフィルタリング（現在は実装されていないため、常にtrue）
+                        // TODO: ステータスフィールドが実装されたら有効化
+                        
+                        return true;
+                    })
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            log.error("高度なクライアント検索に失敗しました", e);
+            // エラー時は空のリストを返す
+            return new ArrayList<>();
+        }
     }
 
     /**

@@ -27,9 +27,6 @@
 
     <div class="header" v-motion="'fade-visible'">
       <div class="header-content">
-        <div class="header-icon">
-          <el-icon size="32"><House /></el-icon>
-        </div>
         <h2>不動産管理システム</h2>
         <p>物件、クライアント、契約を一元管理</p>
         <div class="header-stats">
@@ -971,13 +968,13 @@ const debounceContractSearch = () => {
 
 .header {
   text-align: center;
-  margin-bottom: 48px;
-  padding: 20px 40px;
+  margin-bottom: 24px;
+  padding: 12px 24px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-  border-radius: 24px;
+  border-radius: 16px;
   color: white;
-  margin-top: 80px;
-  box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+  margin-top: 50px;
+  box-shadow: 0 12px 24px rgba(102, 126, 234, 0.3);
   position: relative;
   overflow: hidden;
 }
@@ -994,16 +991,16 @@ const debounceContractSearch = () => {
 }
 
 .header h2 {
-  font-size: 2.2rem;
-  margin-bottom: 8px;
-  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  font-size: 1.6rem;
+  margin-bottom: 4px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
   font-weight: 800;
   letter-spacing: -0.02em;
 }
 
 .header p {
-  font-size: 1rem;
-  margin: 0 0 12px 0;
+  font-size: 0.85rem;
+  margin: 0 0 8px 0;
   opacity: 0.95;
   font-weight: 300;
 }
@@ -1011,19 +1008,19 @@ const debounceContractSearch = () => {
 .header-stats {
   display: flex;
   justify-content: center;
-  gap: 20px;
-  margin-top: 12px;
+  gap: 14px;
+  margin-top: 8px;
 }
 
 .header-stat {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
+  gap: 4px;
+  font-size: 0.75rem;
   opacity: 0.9;
   background: rgba(255, 255, 255, 0.1);
-  padding: 6px 12px;
-  border-radius: 16px;
+  padding: 4px 8px;
+  border-radius: 12px;
   backdrop-filter: blur(10px);
 }
 
@@ -1033,17 +1030,17 @@ const debounceContractSearch = () => {
 }
 
 .stats-row {
-  margin-bottom: 36px;
+  margin-bottom: 24px;
 }
 
 .stat-card {
-  height: 140px;
+  height: 110px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   border: none;
-  border-radius: 20px;
+  border-radius: 16px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(20px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
   overflow: hidden;
   position: relative;
 }
@@ -1060,34 +1057,34 @@ const debounceContractSearch = () => {
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
+  height: 3px;
   background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
 }
 
 .stat-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px) scale(1.02);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
 }
 
 .stat-content {
   display: flex;
   align-items: center;
   height: 100%;
-  padding: 0 24px;
+  padding: 0 20px;
 }
 
 .stat-icon {
-  width: 70px;
-  height: 70px;
-  border-radius: 20px;
+  width: 55px;
+  height: 55px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 24px;
-  font-size: 28px;
+  margin-right: 18px;
+  font-size: 22px;
   color: white;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .stat-icon.property { 
@@ -1112,10 +1109,10 @@ const debounceContractSearch = () => {
 }
 
 .stat-number {
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   font-weight: 800;
   color: #2c3e50;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   background: linear-gradient(135deg, #2c3e50, #34495e);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -1131,7 +1128,7 @@ const debounceContractSearch = () => {
 
 .stat-label {
   color: #7f8c8d;
-  font-size: 1rem;
+  font-size: 0.9rem;
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -1142,16 +1139,16 @@ const debounceContractSearch = () => {
 }
 
 .chart-row {
-  margin-bottom: 36px;
+  margin-bottom: 24px;
 }
 
 .chart-card {
-  height: 400px;
+  height: 320px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 20px;
+  border-radius: 16px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(20px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -1162,9 +1159,9 @@ const debounceContractSearch = () => {
 }
 
 .chart-container {
-  height: 350px;
+  height: 270px;
   position: relative;
-  padding: 20px;
+  padding: 16px;
 }
 
 .chart-container canvas {
@@ -1173,16 +1170,16 @@ const debounceContractSearch = () => {
 }
 
 .action-row {
-  margin-bottom: 36px;
+  margin-bottom: 24px;
 }
 
 .action-card {
-  height: 180px;
+  height: 140px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 20px;
+  border-radius: 16px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(20px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -1193,68 +1190,69 @@ const debounceContractSearch = () => {
 }
 
 .action-card:hover {
-  transform: translateY(-5px) scale(1.02);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.15);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 24px 24px 16px;
+  padding: 18px 20px 12px;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .search-input {
-  width: 240px;
+  width: 200px;
 }
 
 .search-input :deep(.el-input__wrapper) {
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
 }
 
 .search-input :deep(.el-input__wrapper:hover) {
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 5px 16px rgba(0, 0, 0, 0.15);
 }
 
 .action-buttons {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 12px;
   height: 100%;
   justify-content: center;
-  padding: 0 24px 24px;
+  padding: 0 20px 18px;
 }
 
 .action-btn {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 12px;
+  border-radius: 10px;
   font-weight: 600;
+  padding: 8px 16px;
 }
 
 .action-btn:hover {
-  transform: translateX(8px) scale(1.05);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  transform: translateX(6px) scale(1.03);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
 }
 
 .recent-row {
-  margin-bottom: 36px;
+  margin-bottom: 24px;
 }
 
 .recent-card {
-  height: 450px;
+  height: 360px;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 20px;
+  border-radius: 16px;
   background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(20px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
@@ -1265,13 +1263,13 @@ const debounceContractSearch = () => {
 }
 
 .recent-list {
-  height: 370px;
+  height: 280px;
   overflow-y: auto;
-  padding: 0 24px;
+  padding: 0 20px;
 }
 
 .recent-list::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 .recent-list::-webkit-scrollbar-track {
@@ -1288,12 +1286,12 @@ const debounceContractSearch = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 0;
+  padding: 16px 0;
   border-bottom: 1px solid rgba(235, 238, 245, 0.6);
   cursor: pointer;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  border-radius: 12px;
-  margin-bottom: 8px;
+  border-radius: 10px;
+  margin-bottom: 6px;
 }
 
 .dark-mode .recent-item {
@@ -1302,8 +1300,8 @@ const debounceContractSearch = () => {
 
 .recent-item:hover {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
-  transform: translateX(8px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transform: translateX(6px);
+  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.1);
 }
 
 .dark-mode .recent-item:hover {
@@ -1321,8 +1319,8 @@ const debounceContractSearch = () => {
 .item-title {
   font-weight: 600;
   color: #2c3e50;
-  margin-bottom: 8px;
-  font-size: 1.1rem;
+  margin-bottom: 6px;
+  font-size: 1rem;
 }
 
 .dark-mode .item-title {
@@ -1332,8 +1330,8 @@ const debounceContractSearch = () => {
 .item-details {
   display: flex;
   align-items: center;
-  gap: 12px;
-  font-size: 0.9rem;
+  gap: 10px;
+  font-size: 0.85rem;
 }
 
 .price, .amount {
@@ -1348,8 +1346,8 @@ const debounceContractSearch = () => {
 .empty-state {
   text-align: center;
   color: #95a5a6;
-  padding: 60px 0;
-  font-size: 1.1rem;
+  padding: 40px 0;
+  font-size: 1rem;
 }
 
 .dark-mode .empty-state {
@@ -1359,12 +1357,12 @@ const debounceContractSearch = () => {
 .el-icon {
   color: #95a5a6;
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
 }
 
 .recent-item:hover .el-icon {
   color: #667eea;
-  transform: translateX(6px) scale(1.1);
+  transform: translateX(5px) scale(1.1);
 }
 
 /* カスタムスクロールバー */
@@ -1469,61 +1467,62 @@ const debounceContractSearch = () => {
 /* レスポンシブデザイン */
 @media (max-width: 768px) {
   .home {
-    padding: 16px;
+    padding: 12px;
   }
   
   .header {
-    margin-top: 100px;
-    padding: 16px 20px;
+    margin-top: 80px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
   }
   
   .header h2 {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
+  }
+  
+  .header p {
+    font-size: 0.8rem;
   }
   
   .header-stats {
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
+  }
+  
+  .stats-row {
+    margin-bottom: 16px;
   }
   
   .stats-row .el-col {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
+  }
+  
+  .chart-row {
+    margin-bottom: 16px;
   }
   
   .chart-row .el-col {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .action-row {
+    margin-bottom: 16px;
   }
   
   .action-row .el-col {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+  }
+  
+  .recent-row {
+    margin-bottom: 16px;
   }
   
   .recent-row .el-col {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
   
   .search-input {
-    width: 180px;
-  }
-  
-  .stat-card {
-    height: 120px;
-  }
-  
-  .stat-icon {
-    width: 60px;
-    height: 60px;
-    font-size: 24px;
-  }
-}
-
-@media (max-width: 480px) {
-  .header h1 {
-    font-size: 2rem;
-  }
-  
-  .header p {
-    font-size: 1rem;
+    width: 160px;
   }
   
   .stat-card {
@@ -1534,14 +1533,123 @@ const debounceContractSearch = () => {
     width: 50px;
     height: 50px;
     font-size: 20px;
+    margin-right: 16px;
   }
   
   .stat-number {
-    font-size: 1.8rem;
+    font-size: 1.5rem;
+  }
+  
+  .chart-card {
+    height: 280px;
+  }
+  
+  .chart-container {
+    height: 230px;
+  }
+  
+  .action-card {
+    height: 120px;
+  }
+  
+  .recent-card {
+    height: 320px;
+  }
+  
+  .recent-list {
+    height: 240px;
+  }
+}
+
+@media (max-width: 480px) {
+  .home {
+    padding: 8px;
+  }
+  
+  .header {
+    margin-top: 70px;
+    padding: 10px 12px;
+  }
+  
+  .header h2 {
+    font-size: 1.3rem;
+  }
+  
+  .header p {
+    font-size: 0.75rem;
+  }
+  
+  .stat-card {
+    height: 90px;
+  }
+  
+  .stat-icon {
+    width: 45px;
+    height: 45px;
+    font-size: 18px;
+    margin-right: 14px;
+  }
+  
+  .stat-number {
+    font-size: 1.3rem;
+  }
+  
+  .stat-label {
+    font-size: 0.8rem;
+  }
+  
+  .chart-card {
+    height: 250px;
+  }
+  
+  .chart-container {
+    height: 200px;
+  }
+  
+  .action-card {
+    height: 110px;
+  }
+  
+  .recent-card {
+    height: 280px;
+  }
+  
+  .recent-list {
+    height: 200px;
   }
   
   .search-input {
-    width: 140px;
+    width: 120px;
+  }
+  
+  .action-btn {
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .card-header {
+    padding: 14px 16px 10px;
+  }
+  
+  .action-buttons {
+    padding: 0 16px 14px;
+    gap: 10px;
+  }
+  
+  .recent-list {
+    padding: 0 16px;
+  }
+  
+  .recent-item {
+    padding: 12px 0;
+  }
+  
+  .item-title {
+    font-size: 0.9rem;
+  }
+  
+  .item-details {
+    font-size: 0.8rem;
   }
 }
 </style>

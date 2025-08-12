@@ -1,6 +1,7 @@
 package com.realestate.dto;
 
 import com.realestate.entity.Client.ClientType;
+import com.realestate.entity.Client.ClientStatus;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
@@ -19,6 +20,7 @@ public class ClientDto {
     private String phone;
     private String address;
     private ClientType type;
+    private ClientStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

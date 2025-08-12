@@ -11,21 +11,61 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * データ初期化コンポーネント
+ * 
+ * アプリケーション起動時にサンプルデータを自動的に投入します。
+ * 開発・テスト環境での動作確認を容易にするための機能です。
+ * 
+ * @author システム開発チーム
+ * @version 1.0.0
+ * @since 2025-08-11
+ */
 @Component
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
+        /**
+         * 物件リポジトリ（物件データの操作用）
+         */
         private final PropertyRepository propertyRepository;
+        
+        /**
+         * 顧客リポジトリ（顧客データの操作用）
+         */
         private final ClientRepository clientRepository;
+        
+        /**
+         * 契約リポジトリ（契約データの操作用）
+         */
         private final ContractRepository contractRepository;
+        
+        /**
+         * 取引リポジトリ（取引データの操作用）
+         */
         private final TransactionRepository transactionRepository;
 
+        /**
+         * アプリケーション起動時の実行メソッド
+         * 
+         * Spring Bootアプリケーションの起動完了後に自動実行され、
+         * サンプルデータの投入を行います。
+         * 
+         * @param args コマンドライン引数
+         * @throws Exception データ初期化時のエラー
+         */
         @Override
         public void run(String... args) throws Exception {
                 // サンプルデータの投入
                 initializeSampleData();
         }
 
+        /**
+         * サンプルデータの初期化
+         * 
+         * 物件、顧客、契約、取引のサンプルデータを作成し、
+         * データベースに保存します。
+         */
         private void initializeSampleData() {
                 // サンプル物件の作成
                 List<Property> properties = Arrays.asList(
@@ -279,6 +319,7 @@ public class DataInitializer implements CommandLineRunner {
                 client.setPhone(phone);
                 client.setAddress(address);
                 client.setType(type);
+                client.setStatus(Client.ClientStatus.ACTIVE); // デフォルトでアクティブステータスを設定
                 return client;
         }
 

@@ -51,6 +51,17 @@
               </el-select>
             </el-form-item>
             
+            <el-form-item label="ステータス" prop="status">
+              <el-select v-model="form.status" placeholder="ステータスを選択" style="width: 100%">
+                <el-option
+                  v-for="status in clientStatuses"
+                  :key="status.value"
+                  :label="status.label"
+                  :value="status.value"
+                />
+              </el-select>
+            </el-form-item>
+            
             <el-form-item label="住所" prop="address">
               <el-input
                 v-model="form.address"
@@ -95,7 +106,8 @@ const form = ref({
   email: '',
   phone: '',
   address: '',
-  type: '' as ClientType
+  type: '' as ClientType,
+  status: 'ACTIVE'
 })
 
 const rules = {
@@ -117,6 +129,9 @@ const rules = {
   ],
   type: [
     { required: true, message: 'クライアントタイプを選択してください', trigger: 'change' }
+  ],
+  status: [
+    { required: true, message: 'ステータスを選択してください', trigger: 'change' }
   ]
 }
 
@@ -125,6 +140,12 @@ const clientTypes = [
   { value: 'SELLER', label: '売却者' },
   { value: 'TENANT', label: '賃借人' },
   { value: 'LANDLORD', label: '貸主' }
+]
+
+const clientStatuses = [
+  { value: 'ACTIVE', label: 'アクティブ' },
+  { value: 'INACTIVE', label: '非アクティブ' },
+  { value: 'PENDING', label: '保留中' }
 ]
 
 onMounted(() => {
@@ -148,10 +169,11 @@ const loadClient = async () => {
       email: client.email,
       phone: client.phone,
       address: client.address,
-      type: client.type
+      type: client.type,
+      status: client.status || 'ACTIVE'
     }
   } catch (error) {
-    ElMessage.error('クライアントデータの取得に失敗しました')
+    ;(ElMessage as any).error('クライアントデータの取得に失敗しました')
     console.error(error)
   } finally {
     loading.value = false
@@ -169,16 +191,16 @@ const submitForm = async () => {
     if (isEdit.value) {
       const id = Number(route.params.id)
       await clientApi.update(id, form.value)
-      ElMessage.success('クライアントを更新しました')
+      ;(ElMessage as any).success('クライアントを更新しました')
     } else {
       await clientApi.create(form.value)
-      ElMessage.success('クライアントを登録しました')
+      ;(ElMessage as any).success('クライアントを登録しました')
     }
     
     router.push('/clients')
   } catch (error) {
     if (error !== false) {
-      ElMessage.error(isEdit.value ? 'クライアントの更新に失敗しました' : 'クライアントの登録に失敗しました')
+      ;(ElMessage as any).error(isEdit.value ? 'クライアントの更新に失敗しました' : 'クライアントの登録に失敗しました')
       console.error(error)
     }
   } finally {

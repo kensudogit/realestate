@@ -40,6 +40,7 @@ export interface Client {
   phone: string
   address: string
   type: ClientType
+  status?: string
   createdAt?: string
   updatedAt?: string
 }

@@ -4,6 +4,7 @@ import PropertyList from '@/views/PropertyList.vue'
 import PropertyDetail from '@/views/PropertyDetail.vue'
 import PropertyEdit from '@/views/PropertyEdit.vue'
 import ClientList from '@/views/ClientList.vue'
+import ClientDetail from '@/views/ClientDetail.vue'
 import ClientEdit from '@/views/ClientEdit.vue'
 import ContractList from '@/views/ContractList.vue'
 import ContractDetail from '@/views/ContractDetail.vue'
@@ -49,6 +50,12 @@ const routes = [
     path: '/clients/new',
     name: 'ClientNew',
     component: ClientEdit
+  },
+  {
+    path: '/clients/:id',
+    name: 'ClientDetail',
+    component: ClientDetail,
+    props: true
   },
   {
     path: '/clients/:id/edit',

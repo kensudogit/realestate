@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { Property, Client, Contract, Transaction } from '@/types'
 
-const API_BASE_URL = 'http://localhost:8081/api'
+const API_BASE_URL = 'http://localhost:8082/api'
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -31,8 +31,10 @@ export const clientApi = {
   getById: (id: number) => api.get<Client>(`/clients/${id}`),
   create: (client: Client) => api.post<Client>('/clients', client),
   update: (id: number, client: Client) => api.put<Client>(`/clients/${id}`, client),
-  delete: (id: number) => api.delete(`/clients/${id}`),
-  getByType: (type: string) => api.get<Client[]>(`/clients/type/${type}`)
+  delete: (id: number) => api.delete<Client>(`/clients/${id}`),
+  getByType: (type: string) => api.get<Client[]>(`/clients/type/${type}`),
+  search: (query: string) => api.get<Client[]>(`/clients/search?query=${query}`),
+  advancedSearch: (params: URLSearchParams) => api.get<Client[]>(`/clients/search/advanced?${params.toString()}`)
 }
 
 // Contract API
@@ -42,9 +44,10 @@ export const contractApi = {
   getById: (id: number) => api.get<Contract>(`/contracts/${id}`),
   create: (contract: Contract) => api.post<Contract>('/contracts', contract),
   update: (id: number, contract: Contract) => api.put<Contract>(`/contracts/${id}`, contract),
-  delete: (id: number) => api.delete(`/contracts/${id}`),
+  delete: (id: number) => api.delete<Contract>(`/contracts/${id}`),
   getByType: (type: string) => api.get<Contract[]>(`/contracts/type/${type}`),
-  getByStatus: (status: string) => api.get<Contract[]>(`/contracts/status/${status}`)
+  getByStatus: (status: string) => api.get<Contract[]>(`/contracts/status/${status}`),
+  search: (query: string) => api.get<Contract[]>(`/contracts/search?query=${query}`)
 }
 
 // Transaction API

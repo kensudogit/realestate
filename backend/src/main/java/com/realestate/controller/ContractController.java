@@ -65,6 +65,17 @@ public class ContractController {
     }
 
     /**
+     * キーワードによる契約の検索API
+     * 
+     * @param query 検索キーワード（契約番号、物件名、顧客名、契約タイプ、ステータスなど）
+     * @return 該当する契約DTOのリスト
+     */
+    @GetMapping("/search")
+    public ResponseEntity<List<ContractDto>> searchContracts(@RequestParam String query) {
+        return ResponseEntity.ok(contractService.searchContracts(query));
+    }
+
+    /**
      * 新規契約の作成API
      * @param contractDto 作成する契約情報DTO
      * @return 作成された契約DTO
