@@ -1,5 +1,8 @@
 server:
   port: 8082
+  address: 0.0.0.0  # リモートアクセスを許可
+  servlet:
+    context-path: /api
 
 spring:
   application:

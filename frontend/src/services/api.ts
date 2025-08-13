@@ -1,7 +1,14 @@
 import axios from 'axios'
 import type { Property, Client, Contract, Transaction } from '@/types'
 
-const API_BASE_URL = 'http://localhost:8082/api'
+// 動的にホストを設定（リモートアクセス対応）
+const getApiBaseUrl = () => {
+  const hostname = window.location.hostname
+  const port = '8082'
+  return `http://${hostname}:${port}/api`
+}
+
+const API_BASE_URL = getApiBaseUrl()
 
 const api = axios.create({
   baseURL: API_BASE_URL,
