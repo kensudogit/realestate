@@ -33,6 +33,18 @@
             </el-input>
           </el-col>
           <el-col :span="4">
+            <el-input
+              v-model="searchForm.customerName"
+              placeholder="顧客名で検索"
+              clearable
+              class="search-input"
+            >
+              <template #prefix>
+                <el-icon><User /></el-icon>
+              </template>
+            </el-input>
+          </el-col>
+          <el-col :span="4">
             <el-select
               v-model="searchForm.status"
               placeholder="取引ステータス"
@@ -121,11 +133,7 @@
           :row-class-name="getRowClassName"
         >
           <el-table-column prop="id" label="ID" width="80" />
-          <el-table-column label="取引番号" width="120">
-            <template #default="{ row }">
-              <el-checkbox v-model="row.selected" />
-            </template>
-          </el-table-column>
+          <el-table-column prop="transactionNumber" label="取引番号" width="120" />
           <el-table-column prop="type" label="取引タイプ" width="120">
             <template #default="{ row }">
               <el-tag :type="getTypeTagType(row.type)" size="small">
@@ -133,10 +141,11 @@
               </el-tag>
             </template>
           </el-table-column>
-          <el-table-column label="顧客名" width="120">
+          <el-table-column label="顧客名" width="150">
             <template #default="{ row }">
-              <div class="customer-avatar">
-                <el-avatar :size="24" :src="row.customerAvatar" />
+              <div class="customer-info">
+                <el-avatar :size="24" :src="row.customerAvatar" class="customer-avatar" />
+                <span class="customer-name">{{ row.customerName }}</span>
               </div>
             </template>
           </el-table-column>
@@ -539,7 +548,8 @@ import {
   View,
   Edit,
   Delete,
-  InfoFilled
+  InfoFilled,
+  User
 } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -566,6 +576,7 @@ const selectedTransaction = ref<any>(null)
 // 検索フォーム
 const searchForm = ref({
   transactionNumber: '',
+  customerName: '',
   status: '',
   type: '',
   propertyName: ''
@@ -646,6 +657,12 @@ const filteredTransactions = computed(() => {
     )
   }
 
+  if (searchForm.value.customerName) {
+    filtered = filtered.filter(transaction =>
+      transaction.customerName.toLowerCase().includes(searchForm.value.customerName.toLowerCase())
+    )
+  }
+
   if (searchForm.value.status) {
     filtered = filtered.filter(transaction => transaction.status === searchForm.value.status)
   }
@@ -709,7 +726,7 @@ const loadDummyTransactions = () => {
   const dummyTransactions = [
     {
       id: 1,
-      transactionNumber: 'TXN001',
+      transactionNumber: 'TXN-2024-001',
       type: 'PAYMENT',
       customerName: '田中太郎',
       customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=T',
@@ -722,7 +739,7 @@ const loadDummyTransactions = () => {
     },
     {
       id: 2,
-      transactionNumber: 'TXN002',
+      transactionNumber: 'TXN-2024-002',
       type: 'COMMISSION',
       customerName: '佐藤花子',
       customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=S',
@@ -735,7 +752,7 @@ const loadDummyTransactions = () => {
     },
     {
       id: 3,
-      transactionNumber: 'TXN003',
+      transactionNumber: 'TXN-2024-003',
       type: 'MAINTENANCE',
       customerName: '鈴木一郎',
       customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=S',
@@ -748,7 +765,7 @@ const loadDummyTransactions = () => {
     },
     {
       id: 4,
-      transactionNumber: 'TXN004',
+      transactionNumber: 'TXN-2024-004',
       type: 'INSURANCE',
       customerName: '高橋美咲',
       customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=T',
@@ -761,7 +778,7 @@ const loadDummyTransactions = () => {
     },
     {
       id: 5,
-      transactionNumber: 'TXN005',
+      transactionNumber: 'TXN-2024-005',
       type: 'TAX',
       customerName: '伊藤健太',
       customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=I',
@@ -774,7 +791,7 @@ const loadDummyTransactions = () => {
     },
     {
       id: 6,
-      transactionNumber: 'TXN006',
+      transactionNumber: 'TXN-2024-006',
       type: 'REFUND',
       customerName: '渡辺恵子',
       customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=W',
@@ -787,7 +804,7 @@ const loadDummyTransactions = () => {
     },
     {
       id: 7,
-      transactionNumber: 'TXN007',
+      transactionNumber: 'TXN-2024-007',
       type: 'PAYMENT',
       customerName: '中村雄一',
       customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=N',
@@ -800,41 +817,106 @@ const loadDummyTransactions = () => {
     },
     {
       id: 8,
-      transactionNumber: 'TXN008',
+      transactionNumber: 'TXN-2024-008',
       type: 'COMMISSION',
       customerName: '小林麻美',
       customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=K',
-      propertyName: '杉並一戸建て',
-      amount: 95000000,
-      fee: 4750000,
+      propertyName: '池袋タワーマンション',
+      amount: 28000000,
+      fee: 1400000,
       status: 'COMPLETED',
       createdAt: '2024/3/5',
       selected: false
     },
     {
       id: 9,
-      transactionNumber: 'TXN009',
+      transactionNumber: 'TXN-2024-009',
       type: 'MAINTENANCE',
-      customerName: '加藤大輔',
-      customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=K',
-      propertyName: '豊島商業ビル',
+      customerName: '山田次郎',
+      customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=Y',
+      propertyName: '渋谷スクランブルスクエア',
       amount: 12000000,
       fee: 600000,
-      status: 'FAILED',
+      status: 'COMPLETED',
       createdAt: '2024/3/10',
       selected: false
     },
     {
       id: 10,
-      transactionNumber: 'TXN010',
+      transactionNumber: 'TXN-2024-010',
       type: 'INSURANCE',
-      customerName: '山田真理',
-      customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=Y',
-      propertyName: '池袋マンション',
-      amount: 6000000,
-      fee: 300000,
-      status: 'CANCELLED',
+      customerName: '加藤由美',
+      customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=K',
+      propertyName: '銀座オフィスビル',
+      amount: 25000000,
+      fee: 1250000,
+      status: 'PENDING',
       createdAt: '2024/3/15',
+      selected: false
+    },
+    {
+      id: 11,
+      transactionNumber: 'TXN-2024-011',
+      type: 'TAX',
+      customerName: '松本健一',
+      customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=M',
+      propertyName: '原宿商業施設',
+      amount: 8000000,
+      fee: 400000,
+      status: 'COMPLETED',
+      createdAt: '2024/3/20',
+      selected: false
+    },
+    {
+      id: 12,
+      transactionNumber: 'TXN-2024-012',
+      type: 'REFUND',
+      customerName: '井上真理',
+      customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=I',
+      propertyName: '吉祥寺マンション',
+      amount: 5000000,
+      fee: 0,
+      status: 'COMPLETED',
+      createdAt: '2024/3/25',
+      selected: false
+    },
+    {
+      id: 13,
+      transactionNumber: 'TXN-2024-013',
+      type: 'PAYMENT',
+      customerName: '佐々木大輔',
+      customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=S',
+      propertyName: '三鷹一戸建て',
+      amount: 95000000,
+      fee: 4750000,
+      status: 'COMPLETED',
+      createdAt: '2024/4/1',
+      selected: false
+    },
+    {
+      id: 14,
+      transactionNumber: 'TXN-2024-014',
+      type: 'COMMISSION',
+      customerName: '森田美咲',
+      customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=M',
+      propertyName: '立川オフィス',
+      amount: 18000000,
+      fee: 900000,
+      status: 'PENDING',
+      createdAt: '2024/4/5',
+      selected: false
+    },
+    {
+      id: 15,
+      transactionNumber: 'TXN-2024-015',
+      type: 'MAINTENANCE',
+      customerName: '岡本太郎',
+      customerAvatar: 'https://via.placeholder.com/24/9c27b0/ffffff?text=O',
+      propertyName: '八王子倉庫',
+      amount: 3500000,
+      fee: 175000,
+      status: 'COMPLETED',
+      createdAt: '2024/4/10',
       selected: false
     }
   ]
@@ -851,6 +933,7 @@ const handleSearch = () => {
 const resetSearch = () => {
   searchForm.value = {
     transactionNumber: '',
+    customerName: '',
     status: '',
     type: '',
     propertyName: ''
@@ -934,15 +1017,11 @@ const submitEditTransaction = async () => {
 
 // 新規取引登録
 const showNewTransactionDialog = () => {
-  newTransactionForm.value = {
-    transactionNumber: '',
-    type: '',
-    customerName: '',
-    propertyName: '',
-    amount: 0,
-    fee: 0,
-    status: ''
-  }
+  // 新しい取引番号を自動生成
+  const currentYear = new Date().getFullYear()
+  const nextId = transactions.value.length + 1
+  newTransactionForm.value.transactionNumber = `TXN-${currentYear}-${nextId.toString().padStart(3, '0')}`
+  
   newTransactionDialogVisible.value = true
 }
 
@@ -1172,11 +1251,27 @@ const submitTransactionInfo = async () => {
   overflow: hidden;
 }
 
-.customer-avatar {
+/* 顧客情報スタイル */
+.customer-info {
   display: flex;
-  justify-content: center;
+  align-items: center;
+  gap: 8px;
 }
 
+.customer-avatar {
+  flex-shrink: 0;
+}
+
+.customer-name {
+  font-size: 0.9rem;
+  color: #333;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 金額テキストスタイル */
 .amount-text {
   font-weight: 600;
   color: #e74c3c;
